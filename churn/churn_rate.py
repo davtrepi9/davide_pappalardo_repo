@@ -46,57 +46,58 @@ Valutare la performance del modello attraverso metriche come l'accuratezza e l'A
 
 import pandas as pd
 import numpy as np
-import gestioneerrori as ge
+import gestioneerrori as er
 
-"""Dataset: 
-5 min
-ID_Cliente: Identificativo unico per ogni cliente
-Età: Età del cliente
-Durata_Abonnamento: Quanti mesi il cliente è stato abbonato
-Tariffa_Mensile: Quanto il cliente paga al mese
-Dati_Consumati: GB di dati consumati al mese
-Servizio_Clienti_Contatti: Quante volte il cliente ha contattato il servizio clienti
-Churn: Se il cliente ha lasciato la compagnia (Sì/No)"""
-
-
-     
+class gestioneClienti:
     
-cliente = {
-        'ID_Cliente': range(1, 6),
-        'Età': np.random.randint(18, 70, size=5),
-        'Durata_Abbonamento': np.random.randint(1, 12, size=5),
-        'Tariffa_Mensile':  np.random.randint(20, 100, size=5),
-        'Dati_Consumati': np.random.uniform(1, 50, size=5),
-        'Servizio_Clienti_Contatti': np.random.randint(0, 10, size=5),
-        'Churn': np.random.choice(['Y', 'N'], size=5)
+    def __init__(self):
+        self.df = None
+    
+    @staticmethod
+    def crea_df():
+        cliente = {
+            'ID_Cliente': range(1, 21),
+            'Età': np.random.randint(18, 70, size=20),
+            'Durata_Abbonamento': np.random.randint(1, 12, size=20),
+            'Tariffa_Mensile': np.random.randint(20, 100, size=20),
+            'Dati_Consumati': np.random.randint(1, 50, size=20),
+            'Servizio_Clienti_Contatti': np.random.randint(0, 10, size=20),
+            'Churn': np.random.choice(['Y', 'N'], size=20)
         }
-        
-def set_dataframe():
-    df = pd.DataFrame(cliente)
-    df.to_csv('clienti.csv')
-    print(df)
-    return df
 
-def get_info(df):
-    info = df.info()
-    print("\n")
-    print(info)
-    return info
+        df = pd.DataFrame(cliente)
+        df.to_csv('clienti.csv', index=False)
+        print(df)
+        return df
 
-def get_describe(df):
-    describe = df.describe()
-    print("\n")
-    print(describe)
-    return describe
+    def leggi_df(self):
+        self.df = pd.read_csv('clienti.csv')
+        print(self.df)
+        return self.df
 
-def get_value_counts(df):
-    value_churn = df['Churn'].value_counts()
-    print("\n")
-    print(value_churn)
-    return value_churn
+    def get_info(self):
+        info = self.df.info()
+        print("\n")
+        print(info)
+        return info
+
+    def get_describe(self):
+        describe = self.df.describe()
+        print("\n")
+        print(describe)
+        return describe
+
+    def get_value_counts(self):
+        value_churn = self.df['Churn'].value_counts()
+        print("\n")
+        print(value_churn)
+        return value_churn
 
 
-df= set_dataframe()
-get_info(df)
-get_describe(df)
-get_value_counts(df)
+# Utilizzo della classe gestioneClienti
+gc = gestioneClienti()
+df = gc.crea_df()
+gc.leggi_df()
+gc.get_info()
+gc.get_describe()
+gc.get_value_counts()
