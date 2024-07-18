@@ -16,7 +16,7 @@ Churn: Se il cliente ha lasciato la compagnia (Sì/No)
 
 
 Caricamento e Esplorazione Iniziale:
-#5 min
+#5 min  
 Caricare i dati da un file CSV.
 Utilizzare info(), describe(), e value_counts() per esaminare la distribuzione dei dati e identificare colonne con
 valori mancanti.
@@ -33,7 +33,7 @@ Utilizzare groupby() per esplorare la relazione tra Età, Durata_Abonnamento, Ta
 Utilizzare metodi come corr() per identificare possibili correlazioni tra le variabili.
 
 Preparazione dei Dati per la Modellazione:
-# ? 
+# 20 min
 Convertire la colonna Churn in formato numerico (0 per "No", 1 per "Sì").
 Normalizzare le colonne numeriche usando numpy per prepararle per la modellazione.
 
@@ -52,23 +52,6 @@ class gestioneClienti:
     
     def __init__(self):
         self.df = None
-    
-    
-    def crea_df():
-        cliente = {
-            'ID_Cliente': range(1, 21),
-            'Età': np.random.randint(18, 70, size=20),
-            'Durata_Abbonamento': np.random.randint(1, 12, size=20),
-            'Tariffa_Mensile': np.random.randint(20, 100, size=20),
-            'Dati_Consumati': np.random.randint(1, 50, size=20),
-            'Servizio_Clienti_Contatti': np.random.randint(0, 10, size=20),
-            'Churn': np.random.choice(['Y', 'N'], size=20)
-        }
-
-        df = pd.DataFrame(cliente)
-        df.to_csv('clienti.csv', index=False)
-        print(df)
-        return df
 
     def leggi_df(self):
         self.df = pd.read_csv('clienti.csv')
@@ -93,11 +76,58 @@ class gestioneClienti:
         print(value_churn)
         return value_churn
 
+    def rimuovi_anomalie(self):
 
-# Utilizzo della classe gestioneClienti
-gc = gestioneClienti()
-df = gc.crea_df()
-gc.leggi_df()
-gc.get_info()
-gc.get_describe()
-gc.get_value_counts()
+        self.df.loc[(self.df['Età'] < 18) | (self.df['Età'] > 90), 'Età'] = np.nan
+        self.df.loc[self.df['Durata_Abbonamento'] <= 0, 'Durata_Abbonamento'] = np.nan
+        self.df.loc[(self.df['Tariffa_Mensile'] <= 0) | (self.df['Tariffa_Mensile'] > 1000), 'Tariffa_Mensile'] = np.nan
+        self.df.loc[(self.df['Dati_Consumati'] <= 0) | (self.df['Dati_Consumati'] > 1000), 'Dati_Consumati'] = np.nan
+        self.df.loc[(self.df['Servizio_Clienti_Contatti'] < 0) | (self.df['Servizio_Clienti_Contatti'] > 100), 'Servizio_Clienti_Contatti'] = np.nan
+        print(self.df)
+        return self.df
+
+    def pulizia_dati(self):
+        df = self.df.dropna(subset=['ID_Cliente'])
+        return df
+
+    def imputa_dati_mancanti(self):
+        df = self.df['Età'] = self.df['Età'].fillna(self.df['Età'].mean())
+        df = self.df['Durata_Abbonamento'] = self.df['Durata_Abbonamento'].fillna(self.df['Durata_Abbonamento'].median())
+        df = self.df['Tariffa_Mensile'] = self.df['Tariffa_Mensile'].fillna(self.df['Tariffa_Mensile'].mean())
+        df = self.df['Dati_Consumati'] = self.df['Dati_Consumati'].fillna(self.df['Dati_Consumati'].median())
+        df = self.df['Servizio_Clienti_Contatti'] = self.df['Servizio_Clienti_Contatti'].fillna(self.df['Servizio_Clienti_Contatti'].mode()[0])
+        df = self.df['Churn'] = self.df['Churn'].fillna('No')
+        return df
+
+    def aggiungi_categoria(self):
+        print("\n")
+        self.df['Costo_per_GB']=self.df['Tariffa_Mensile']/self.df['Dati_Consumati']
+        print("\n La categoria è stata aggiunta: \n", self.df)
+        return True
+
+    def dati_gruppo(self):
+        m_età_tariffa = self.df.groupby('Età')['Tariffa_Mensile'].mean()
+        print("\n",m_età_tariffa)
+        m_churn_durata = self.df.groupby('Churn')['Tariffa_Mensile'].mean()
+        print("\n", m_churn_durata)
+        m_età_durata = self.df.groupby('Durata_Abbonamento')['Età'].mean()
+        print("\n", m_età_durata)
+
+    def correlazioni(self):
+        print(self.df.corr(method = 'pearson',numeric_only = True))
+
+    def conversione_churn(self):
+    # Conversione della colonna Churn in formato numerico
+     self.df['Churn'] = self.df['Churn'].map({'N': 0, 'Y': 1})
+     return self.df
+
+    def normalizzazione(self):
+     for colonna in ['Età', 'Durata_Abbonamento', 'Tariffa_Mensile', 'Dati_Consumati', 'Servizio_Clienti_Contatti']:
+        self.df[colonna] = (self.df[colonna] - self.df[colonna].mean()) / self.df[colonna].std()
+     return self.df
+
+
+# Test
+nuovo = gestioneClienti()
+nuovo.leggi_df()
+
