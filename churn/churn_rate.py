@@ -53,7 +53,7 @@ class gestioneClienti:
     def __init__(self):
         self.df = None
     
-    @staticmethod
+    
     def crea_df():
         cliente = {
             'ID_Cliente': range(1, 21),
