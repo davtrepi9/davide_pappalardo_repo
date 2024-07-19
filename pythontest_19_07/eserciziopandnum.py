@@ -47,3 +47,7 @@ minimo = df.groupby('Data')['Vendite'].sum().min()
 
 print(f"\nLa data in cui si è venduto di più è stata {data}, con un totale di {massimo} vendite")
 print(f"\nLa data in cui si è venduto di meno ha di più è stata {data}, con un totale di {minimo} vendite")
+
+#salvo in una nuovo csv
+mediavendite.to_csv('media_venditeorarie.csv', index=False)
+print("\nCreato nuovo file csv")
