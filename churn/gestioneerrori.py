@@ -1,12 +1,12 @@
 class Error():
-    pass
+   
     
-def gestioneKeyError():
-    print("\nError: Stai tentando di accedere ad una chiave inesistente ")
+    def gestioneKeyError(self):
+        print("\nError: Stai tentando di accedere ad una chiave inesistente ")
 
-def gestioneAttributeError():
-    print("\nDato non presente")
+    def gestioneAttributeError(self):
+        print("\nDato non presente")
 
-def gestioneTypeError():
-    print("\nErrore sul tipo, NaN type presente e non sovrascrivibile")
-    
+    def gestioneTypeError(self):
+        print("\nErrore sul tipo, NaN type presente e non sovrascrivibile")
+        

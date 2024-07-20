@@ -46,7 +46,10 @@ Valutare la performance del modello attraverso metriche come l'accuratezza e l'A
 
 import pandas as pd
 import numpy as np
-import gestioneerrori as er
+import gestioneerrori as errori
+
+
+errori = errori.Error()
 
 class GestioneClienti:
     
@@ -65,7 +68,7 @@ class GestioneClienti:
             print(info)
             return info
         except AttributeError:
-            er.gestioneAttributeError()
+            errori.gestioneAttributeError()
 
     def get_describe(self):
         try:
@@ -74,7 +77,7 @@ class GestioneClienti:
             print(describe)
             return describe
         except AttributeError:
-            er.gestioneAttributeError()
+            errori.gestioneAttributeError()
 
     def get_value_counts(self):
         try:
@@ -83,7 +86,7 @@ class GestioneClienti:
             print(value_churn)
             return value_churn
         except TypeError:
-            er.gestioneTypeError()
+            errori.gestioneTypeError()
 
     def rimuovi_anomalie(self):
         try:
@@ -93,29 +96,34 @@ class GestioneClienti:
             self.df.loc[(self.df['Dati_Consumati'] <= 0) | (self.df['Dati_Consumati'] > 1000), 'Dati_Consumati'] = np.nan
             self.df.loc[(self.df['Servizio_Clienti_Contatti'] < 0) | (self.df['Servizio_Clienti_Contatti'] > 100), 'Servizio_Clienti_Contatti'] = np.nan
             print(self.df)
+            GestioneClienti.salva_csv(self.df)
             return self.df
         except AttributeError:
-            er.gestioneAttributeError()
+            errori.gestioneAttributeError()
 
     def pulizia_dati(self):
         try:
-            df = self.df.dropna(subset=['ID_Cliente'])
-            print(df)
-            return df
+            self.df.dropna(subset=['ID_Cliente'])
+            print(self.df)
+            GestioneClienti.salva_csv(self.df)
+            return self.df
         except AttributeError:
-            er.gestioneTypeError()
+            errori.gestioneAttributeError()
 
     def imputa_dati_mancanti(self):
         try:
-            df = self.df['Età'] = self.df['Età'].fillna(self.df['Età'].mean())
-            df = self.df['Durata_Abbonamento'] = self.df['Durata_Abbonamento'].fillna(self.df['Durata_Abbonamento'].median())
-            df = self.df['Tariffa_Mensile'] = self.df['Tariffa_Mensile'].fillna(self.df['Tariffa_Mensile'].mean())
-            df = self.df['Dati_Consumati'] = self.df['Dati_Consumati'].fillna(self.df['Dati_Consumati'].median())
-            df = self.df['Servizio_Clienti_Contatti'] = self.df['Servizio_Clienti_Contatti'].fillna(self.df['Servizio_Clienti_Contatti'].mode()[0])
-            df = self.df['Churn'] = self.df['Churn'].fillna('No')
-            return df
+            self.df['Età'] = self.df['Età'].fillna(self.df['Età'].mean())
+            self.df['Durata_Abbonamento'] = self.df['Durata_Abbonamento'].fillna(self.df['Durata_Abbonamento'].median())
+            self.df['Tariffa_Mensile'] = self.df['Tariffa_Mensile'].fillna(self.df['Tariffa_Mensile'].mean())
+            self.df['Dati_Consumati'] = self.df['Dati_Consumati'].fillna(self.df['Dati_Consumati'].median())
+            self.df['Servizio_Clienti_Contatti'] = self.df['Servizio_Clienti_Contatti'].fillna(self.df['Servizio_Clienti_Contatti'].mode()[0])
+            self.df['Churn'] = self.df['Churn'].fillna('No')
+            print(self.df)
+            GestioneClienti.salva_csv(self.df)
+            return self.df
+
         except TypeError:
-            er.gestioneTypeError()
+            errori.gestioneTypeError()
 
     def aggiungi_categoria(self):
         try:
@@ -124,7 +132,7 @@ class GestioneClienti:
             print("\n La categoria è stata aggiunta: \n", self.df)
             return True
         except TypeError:
-            er.gestioneTypeError()
+            errori.gestioneTypeError()
 
     def dati_gruppo(self):
         try:
@@ -135,22 +143,22 @@ class GestioneClienti:
             m_età_durata = self.df.groupby('Durata_Abbonamento')['Età'].mean()
             print("\n", m_età_durata)
         except AttributeError:
-            er.gestioneAttributeError()
+            errori.gestioneAttributeError()
 
     def correlazioni(self):
         try:
             print(self.df.corr(method = 'pearson',numeric_only = True))
         except AttributeError:
-            er.gestioneAttributeError()
+            errori.gestioneAttributeError()
 
     def conversione_churn(self):
             try:
-                self.df['Churn'] = self.df['Churn'].map({'N': 0, 'Y': 1})
+                self.df['Churn']=self.df['Churn'].map(lambda x: 1 if x == "Sì" else 0)
                 print(self.df)
+                GestioneClienti.salva_csv(self.df)
                 return self.df
-
             except TypeError:
-                er.gestioneTypeError()
+                errori.gestioneTypeError()
 
     def normalizzazione(self):
         try:
@@ -159,6 +167,33 @@ class GestioneClienti:
                 print(self.df)
             return self.df
         except TypeError:
-            er.gestioneTypeError()
+            errori.gestioneTypeError()
 
+    def salva_csv(df):
+        df.to_csv('clienti.csv', index=False)
+        print(" -- CSV AGGIORNATO -- ")
+        
+
+#CSV INIZIALE DI RIFERIMENTO 
+"""ID_Cliente,Età,Durata_Abbonamento,Tariffa_Mensile,Dati_Consumati,Servizio_Clienti_Contatti,Churn
+1.0,-28.0,39.0,29.36,45.2,6.0,
+2.0,-55.0,48.0,,15.97,1.0,Sì
+3.0,27.0,54.0,51.28,22.36,3.0,Sì
+4.0,32.0,52.0,93.5,36.53,1.0,No
+5.0,,53.0,66.76,,5.0,No
+6.0,31.0,,78.61,18.34,0.0,Sì
+,34.0,7.0,21.06,8.88,4.0,No
+8.0,69.0,7.0,63.42,7.93,5.0,No
+,46.0,,88.98,12.39,6.0,No
+10.0,43.0,57.0,57.11,10.45,,Sì
+11.0,69.0,,43.05,8.69,6.0,Sì
+,54.0,39.0,69.63,9.14,6.0,
+13.0,66.0,17.0,32.95,2.75,4.0,No
+14.0,54.0,18.0,29.73,9.07,6.0,Sì
+,44.0,,28.91,41.52,3.0,No
+16.0,69.0,15.0,34.96,,3.0,Sì
+17.0,39.0,16.0,22.82,34.44,9.0,Sì
+18.0,44.0,46.0,24.91,2.78,6.0,No
+19.0,24.0,,26.75,6.74,7.0,Sì
+20.0,42.0,57.0,76.71,7.09,5.0,No"""
 
