@@ -1,3 +1,4 @@
+#Realizzato con Amalia Chiariello
 import pandas as pd
 import numpy as np
 import gestioneerrori as er
